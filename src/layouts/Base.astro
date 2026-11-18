@@ -1,0 +1,87 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Portfolio' } = Astro.props;
+const siteName = 'Renee Bibby';
+
+const nav = [
+  { href: '/', label: 'Work' },
+  { href: '/about/', label: 'About' },
+  { href: '/cv/', label: 'CV' },
+];
+
+// Mark the current section so the nav can underline it.
+const current = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? current === '/' || current.startsWith('/work/') : current.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title === siteName ? title : `${title} · ${siteName}`}</title>
+  </head>
+  <body>
+    <header class="wrap site-header">
+      <a href="/" class="site-name">{siteName}</a>
+      <nav aria-label="Main">
+        {nav.map(({ href, label }) => (
+          <a href={href} aria-current={isActive(href) ? 'page' : undefined}>{label}</a>
+        ))}
+      </nav>
+    </header>
+
+    <main class="wrap site-main">
+      <slot />
+    </main>
+
+    <footer class="wrap site-footer muted">
+      <small>© {new Date().getFullYear()} {siteName}</small>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .site-name {
+    font-weight: 500;
+  }
+
+  nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .site-main {
+    flex: 1;
+    padding-block: 2.5rem;
+  }
+
+  .site-footer {
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--rule);
+  }
+</style>

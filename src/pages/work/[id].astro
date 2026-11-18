@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+
+// One static page per artwork, keyed by the Markdown filename.
+export async function getStaticPaths() {
+  const artworks = await getCollection('artworks');
+  return artworks.map((artwork) => ({
+    params: { id: artwork.id },
+    props: { artwork },
+  }));
+}
+
+const { artwork } = Astro.props;
+const { title, description, date, image } = artwork.data;
+const { Content } = await render(artwork);
+---
+
+<Base title={title} description={description}>
+  <article class="piece">
+    <Image src={image} alt={description} width={1600} class="hero" />
+    <div class="meta">
+      <h1>{title}</h1>
+      <p class="muted">{date.getFullYear()}</p>
+      <Content />
+    </div>
+    <p><a href="/">← All work</a></p>
+  </article>
+</Base>
+
+<style>
+  .piece {
+    max-width: 56rem;
+    margin-inline: auto;
+  }
+
+  .hero {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .meta {
+    margin-bottom: 2rem;
+  }
+</style>
